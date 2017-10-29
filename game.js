@@ -35,6 +35,7 @@ var mouse = {
 }
 var click = false;
 var keys = [];
+var isOver = false;
 
 /*
 * @param {int} x - x Coordinate
@@ -128,9 +129,26 @@ function mouseClicked(x, y) {
   for(var i = 0; i<rows; i++) {
     for(var j = 0; j<cols; j++) {
       var temp = grid[i][j];
-      if(x > temp.x && x < temp.x+temp.w && y > temp.y && y< temp.y+temp.w) temp.reveal();
+       if(x > temp.x && x < temp.x+temp.w && y > temp.y && y< temp.y+temp.w) {
+         if(!temp.shrim) temp.reveal();
+         else isOver = true;
+       }
     }
   }
+}
+
+function gameOver() {
+  var count = 0;
+   for(i in grid) {
+     for(j in grid) {
+       if(isOver) {
+         grid[i][j].reveal();
+       }
+       if(!grid[i][j].show && !grid[i][j].shrim) count++;
+     }
+   }
+
+   if(count == 0) isOver = true;
 }
 
 //track mouse position
@@ -153,6 +171,7 @@ window.onload = function() {
 // Runs every frame
 function update(){
     requestAnimationFrame(update);
+    gameOver();
 }
 
 /*
@@ -176,18 +195,23 @@ function draw() {
     for(var i=0; i<rows; i++) {
       for(var j=0; j<cols; j++) {
         var temp = grid[i][j];
+
         if(temp.show) ctx.fillStyle = "gray";
+
         else ctx.fillStyle = "white";
         rect(temp.x, temp.y, temp.w, temp.w);
-        if(temp.shrim && temp.show) {
+
+        if(temp.shrim) {
           ctx.strokeStyle = "black";
           ctx.fillStyle = "red";
           circle(temp.x+temp.w*0.5, temp.y+temp.w*0.5, temp.w*0.25);
         }
-        if(temp.show && temp.shrimCount > 0) {
+
+        if(temp.shrimCount > 0) {
           ctx.fillStyle = "black";
           ctx.fillText(temp.shrimCount, temp.x+temp.w*0.35, temp.y+temp.w*0.65);
         }
+
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
       }
