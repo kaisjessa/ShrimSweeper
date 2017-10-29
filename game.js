@@ -205,10 +205,12 @@ function update(){
     if(Shrimad) {
       document.getElementById("turn").innerHTML = "Shrimad's Turn";
       shrimimg.src = "red.png";
+      document.getElementById("image").src = "blue.png";
     }
     else {
       document.getElementById("turn").innerHTML = "Shrim-Very-Mad's Turn";
-      shrimimg.src = "blue.png"
+      shrimimg.src = "blue.png";
+      document.getElementById("image").src = "red.png";
     }
 }
 
@@ -226,31 +228,33 @@ function getRandomInt(min, max) {
 //Runs every frame and draws to canvas
 function draw() {
     clear();
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.0)';
+    ctx.fillStyle = 'white';
     ctx.strokeStyle = "black";
     ctx.font = "30px Oleo Script";
 
     for(var i=0; i<rows; i++) {
       for(var j=0; j<cols; j++) {
         var temp = grid[i][j];
+        if(temp.show) ctx.fillStyle = 'gray';
         rect(temp.x, temp.y, temp.w, temp.w);
+
+
 
         if(temp.shrim  && temp.show) {
           ctx.strokeStyle = "black";
           ctx.fillStyle = "red";
           //circle(temp.x+temp.w*0.5, temp.y+temp.w*0.5, temp.w*0.25);
           ctx.drawImage(shrimimg, temp.x + 10, temp.y + 10);
-          ctx.fillStyle = 'rgba(255, 0, 0, 0.0)';
         }
 
         if(temp.shrimCount > 0 && temp.show) {
           ctx.fillStyle = "black";
           ctx.fillText(temp.shrimCount, temp.x+temp.w*0.35, temp.y+temp.w*0.65);
-          ctx.fillStyle = 'rgba(255, 0, 0, 0.0)';
         }
 
         //ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
+        ctx.fillStyle = "white";
       }
     }
 }
