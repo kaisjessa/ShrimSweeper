@@ -36,6 +36,10 @@ var mouse = {
 var click = false;
 var keys = [];
 var isOver = false;
+var isWin = false;
+var Shrimad = true;
+var shrimimg = new Image();
+shrimimg.src = "red.png";
 
 /*
 * @param {int} x - x Coordinate
@@ -138,6 +142,7 @@ function mouseClicked(x, y) {
 }
 
 function gameOver() {
+
   var count = 0;
    for(i in grid) {
      for(j in grid) {
@@ -147,8 +152,29 @@ function gameOver() {
        if(!grid[i][j].show && !grid[i][j].shrim) count++;
      }
    }
+   if(count == 0) {
+     isOver = true;
+     isWin = true;
+   }
 
-   if(count == 0) isOver = true;
+   if(isOver) {
+     if(Shrimad && !isWin) {
+       document.getElementById("turn").innerHTML = "Shrim-Very-Mad Wins!";
+       shrimimg.src = "red.png";
+     }
+     else if(Shrimad && isWin) {
+       document.getElementById("turn").innerHTML = "Shrimad Wins!";
+       shrimimg.src = "blue.png";
+     }
+     else if(!Shrimad && !isWin) {
+       document.getElementById("turn").innerHTML = "Shrimad Wins!";
+       shrimimg.src = "blue.png";
+     }
+     else {
+       document.getElementById("turn").innerHTML = "Shrim-Very-Mad Wins!";
+       shrimimg.src = "red.png";
+     }
+   }
 }
 
 //track mouse position
@@ -164,7 +190,11 @@ window.onload = function() {
     var evnt = window.event || e;
     mouse.x = evnt.clientX;
     mouse.y = evnt.clientY;
-    mouseClicked(mouse.x, mouse.y);
+    if(!isOver) {
+      mouseClicked(mouse.x, mouse.y);
+      if(Shrimad) Shrimad = false;
+      else Shrimad = true;
+    }
   }
 }
 
@@ -172,6 +202,14 @@ window.onload = function() {
 function update(){
     requestAnimationFrame(update);
     gameOver();
+    if(Shrimad) {
+      document.getElementById("turn").innerHTML = "Shrimad's Turn";
+      shrimimg.src = "red.png";
+    }
+    else {
+      document.getElementById("turn").innerHTML = "Shrim-Very-Mad's Turn";
+      shrimimg.src = "blue.png"
+    }
 }
 
 /*
@@ -188,31 +226,30 @@ function getRandomInt(min, max) {
 //Runs every frame and draws to canvas
 function draw() {
     clear();
-    ctx.fillStyle = "white";
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.0)';
     ctx.strokeStyle = "black";
-    ctx.font = "30px Arial";
+    ctx.font = "30px Oleo Script";
 
     for(var i=0; i<rows; i++) {
       for(var j=0; j<cols; j++) {
         var temp = grid[i][j];
-
-        if(temp.show) ctx.fillStyle = "gray";
-
-        else ctx.fillStyle = "white";
         rect(temp.x, temp.y, temp.w, temp.w);
 
-        if(temp.shrim) {
+        if(temp.shrim  && temp.show) {
           ctx.strokeStyle = "black";
           ctx.fillStyle = "red";
-          circle(temp.x+temp.w*0.5, temp.y+temp.w*0.5, temp.w*0.25);
+          //circle(temp.x+temp.w*0.5, temp.y+temp.w*0.5, temp.w*0.25);
+          ctx.drawImage(shrimimg, temp.x + 10, temp.y + 10);
+          ctx.fillStyle = 'rgba(255, 0, 0, 0.0)';
         }
 
-        if(temp.shrimCount > 0) {
+        if(temp.shrimCount > 0 && temp.show) {
           ctx.fillStyle = "black";
           ctx.fillText(temp.shrimCount, temp.x+temp.w*0.35, temp.y+temp.w*0.65);
+          ctx.fillStyle = 'rgba(255, 0, 0, 0.0)';
         }
 
-        ctx.fillStyle = "white";
+        //ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
       }
     }
