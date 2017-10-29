@@ -17,16 +17,17 @@ This text is displayed if your browser does not support HTML5 Canvas.
       }
 *
 */
-
 var canvas;
 var ctx;
 var WIDTH = 650;
 var HEIGHT = 650;
-var character = {
-  x: 100,
-  y: 100,
-  r: 10
-}
+var dim = 65;
+var cols = Math.floor(HEIGHT / dim);
+var rows = Math.floor(WIDTH / dim);
+console.log(rows);
+var grid;
+var options = [];
+var numShrims = 15;
 
 var mouse = {
   x: 0,
@@ -75,8 +76,61 @@ function clear() {
 function init() {
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
+    boardSetUp();
     return setInterval(draw, 60/100); // Framerate (default: 60 FPS)
 
+
+}
+
+function makeBoardArray() {
+  var arr = new Array(rows);
+  for(var i=0; i<arr.length; i++) {
+    arr[i] = new Array(cols);
+  }
+  return arr;
+}
+
+function boardSetUp() {
+  grid = makeBoardArray();
+  for(var i = 0; i < rows; i++) {
+    for(var j = 0; j < cols; j++) {
+      grid[i][j] = new Cell(i, j, dim);
+    }
+  }
+
+  for(var i=0; i<rows; i++) {
+    for(var j=0; j<cols; j++) {
+      options.push([i, j]);
+    }
+  }
+  chooseShrims();
+
+  for(var i = 0; i<rows; i++) {
+    for(var j = 0; j<cols; j++) {
+      grid[i][j].countShrims(grid);
+    }
+  }
+}
+
+function chooseShrims() {
+  for(var q = 0; q<numShrims; q++) {
+    var index = getRandomInt(0, options.length);
+    console.log("test" + index);
+    var i = options[index][0];
+    var j = options[index][1];
+    options.splice(index, 1);
+    grid[i][j].shrim=true;
+    console.log(grid[i][j]);
+  }
+}
+
+function mouseClicked(x, y) {
+  for(var i = 0; i<rows; i++) {
+    for(var j = 0; j<cols; j++) {
+      var temp = grid[i][j];
+      if(x > temp.x && x < temp.x+temp.w && y > temp.y && y< temp.y+temp.w) temp.reveal();
+    }
+  }
 }
 
 //track mouse position
@@ -92,49 +146,13 @@ window.onload = function() {
     var evnt = window.event || e;
     mouse.x = evnt.clientX;
     mouse.y = evnt.clientY;
-    if(click) {
-      click = false;
-    }
-    else {
-      click = true;
-    }
-  }
-  window.onmouseup=function(e) {
-    //Code
+    mouseClicked(mouse.x, mouse.y);
   }
 }
 
 // Runs every frame
 function update(){
     requestAnimationFrame(update);
-
-    if(keys[38]) { // Up arrow
-      character.y--;
-    }
-
-    if (keys[40]) { // Down arrow
-      character.y++;
-    }
-    if (keys[39]) { // Right arrow
-      character.x++;
-    }
-    if (keys[37]) { // Left arrow
-      character.x--;
-    }
-
-    //Keep character within canvas
-    if(character.x > WIDTH) {
-      character.x = WIDTH;
-    }
-    if(character.x < 0) {
-      character.x = 0;
-    }
-    if(character.y > HEIGHT) {
-      character.y = HEIGHT;
-    }
-    if(character.y < 0) {
-      character.y = 0;
-    }
 }
 
 /*
@@ -151,16 +169,29 @@ function getRandomInt(min, max) {
 //Runs every frame and draws to canvas
 function draw() {
     clear();
-    if(!click) {
-      ctx.fillStyle = "black";
-      ctx.strokeStyle = "black";
-    }
-    else {
-      ctx.fillStyle = "red";
-      ctx.strokeStyle = "red";
-    }
+    ctx.fillStyle = "white";
+    ctx.strokeStyle = "black";
+    ctx.font = "30px Arial";
 
-    circle(character.x, character.y, character.r);
+    for(var i=0; i<rows; i++) {
+      for(var j=0; j<cols; j++) {
+        var temp = grid[i][j];
+        if(temp.show) ctx.fillStyle = "gray";
+        else ctx.fillStyle = "white";
+        rect(temp.x, temp.y, temp.w, temp.w);
+        if(temp.shrim && temp.show) {
+          ctx.strokeStyle = "black";
+          ctx.fillStyle = "red";
+          circle(temp.x+temp.w*0.5, temp.y+temp.w*0.5, temp.w*0.25);
+        }
+        if(temp.show && temp.shrimCount > 0) {
+          ctx.fillStyle = "black";
+          ctx.fillText(temp.shrimCount, temp.x+temp.w*0.35, temp.y+temp.w*0.65);
+        }
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+      }
+    }
 }
 
 // Main part of program
