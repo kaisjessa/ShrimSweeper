@@ -36,10 +36,10 @@ var mouse = {
 var click = false;
 var keys = [];
 var isOver = false;
-var isWin = false;
-var Shrimad = true;
 var shrimimg = new Image();
-shrimimg.src = "red.png";
+shrimimg.src = "blue.png";
+var badShrimimg = new Image();
+badShrimimg.src = "red.png";
 
 /*
 * @param {int} x - x Coordinate
@@ -142,7 +142,6 @@ function mouseClicked(x, y) {
 }
 
 function gameOver() {
-
   var count = 0;
    for(i in grid) {
      for(j in grid) {
@@ -154,26 +153,6 @@ function gameOver() {
    }
    if(count == 0) {
      isOver = true;
-     isWin = true;
-   }
-
-   if(isOver) {
-     if(Shrimad && !isWin) {
-       document.getElementById("turn").innerHTML = "Shrim-Very-Mad Wins!";
-       shrimimg.src = "red.png";
-     }
-     else if(Shrimad && isWin) {
-       document.getElementById("turn").innerHTML = "Shrimad Wins!";
-       shrimimg.src = "blue.png";
-     }
-     else if(!Shrimad && !isWin) {
-       document.getElementById("turn").innerHTML = "Shrimad Wins!";
-       shrimimg.src = "blue.png";
-     }
-     else {
-       document.getElementById("turn").innerHTML = "Shrim-Very-Mad Wins!";
-       shrimimg.src = "red.png";
-     }
    }
 }
 
@@ -192,8 +171,6 @@ window.onload = function() {
     mouse.y = evnt.clientY;
     if(!isOver) {
       mouseClicked(mouse.x, mouse.y);
-      if(Shrimad) Shrimad = false;
-      else Shrimad = true;
     }
   }
 }
@@ -202,16 +179,6 @@ window.onload = function() {
 function update(){
     requestAnimationFrame(update);
     gameOver();
-    if(Shrimad) {
-      document.getElementById("turn").innerHTML = "Shrimad's Turn";
-      shrimimg.src = "red.png";
-      document.getElementById("image").src = "blue.png";
-    }
-    else {
-      document.getElementById("turn").innerHTML = "Shrim-Very-Mad's Turn";
-      shrimimg.src = "blue.png";
-      document.getElementById("image").src = "red.png";
-    }
 }
 
 /*
@@ -244,7 +211,7 @@ function draw() {
           ctx.strokeStyle = "black";
           ctx.fillStyle = "red";
           //circle(temp.x+temp.w*0.5, temp.y+temp.w*0.5, temp.w*0.25);
-          ctx.drawImage(shrimimg, temp.x + 10, temp.y + 10);
+          ctx.drawImage(badShrimimg, temp.x + 10, temp.y + 10);
         }
 
         if(temp.shrimCount > 0 && temp.show) {
